@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 import { default as connectDB } from './connectDB.js';
 import courseRoutes from './routes/courseRoute.js';
 import adminRoute from './routes/adminRoute.js';
+import emergencyRoute from './routes/emergencyRoute.js';
 
 // dotenv.config({ path: 'config.env' });
 
@@ -31,4 +32,5 @@ connectDB()
 //Routes
 app.use(adminRoute)
 app.use(courseRoutes)
+app.use(emergencyRoute)
 
