@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 
 import { default as connectDB } from './connectDB.js';
 import courseRoutes from './routes/courseRoute.js';
+import adminRoute from './routes/adminRoute.js';
 
 // dotenv.config({ path: 'config.env' });
 
@@ -17,8 +18,7 @@ app.use(express.json())
   // Middleware to parse URL-encoded bodies
   app.use(urlencoded({ extended: true }));
   app.use(morgan('dev'));
-  // app.use(json());
-  app.use(courseRoutes)
+ 
 
 // Start the server 
 const PORT =4121;
@@ -27,4 +27,8 @@ app.listen(PORT, () => {
 });
 
 connectDB()
+
+//Routes
+app.use(adminRoute)
+app.use(courseRoutes)
 

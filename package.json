@@ -19,6 +19,5 @@
     "morgan": "^1.10.0",
     "require": "^2.4.20"
   },
-  "type" :"module",
-  "devDependencies": {}
+  "type": "module"
 }
