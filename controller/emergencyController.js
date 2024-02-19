@@ -64,5 +64,19 @@ class emergencyController {
         }
   }
 
+
+  static update = async (req, res) => {
+    try {
+        let emergency = await emergencyModel.findOneAndUpdate({ id: req.params.id }, { $set: req.body }, { new: true });
+        res.json({ msg: "Updated Note", emergency });
+    } catch (error) {
+        res.status(500).json({ error: "An error occurred while updating the emergency " });
+    }
 }
+
+
+
+}
+
+
 export default emergencyController
