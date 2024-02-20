@@ -33,4 +33,7 @@ connectDB()
 app.use(adminRoute)
 app.use(courseRoutes)
 app.use(emergencyRoute)
+app.use(historyRoute)
+app.use(patientRoute)
+app.use(medicineRoute)
 
