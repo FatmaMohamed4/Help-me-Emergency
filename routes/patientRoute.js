@@ -85,6 +85,7 @@
 import express from "express";
 import { check } from "express-validator";
 import patientController from "../controller/patientController.js";
+import authController from "../controller/authController.js";
 
 const patientRoute = express.Router();
 
@@ -142,9 +143,13 @@ patientRoute.post('/login', [
 ], patientController.LogInPatient);
 
 // CRUD ==> All, byId, update, delete
-patientRoute.get('/api/patient/all', patientController.getAllPatient);
-patientRoute.get('/api/patient/:id', patientController.getPatientById);
-patientRoute.put('/api/patient/:id', patientController.updatePatient);
-patientRoute.delete('/api/patient/:id', patientController.deletePatient);
+patientRoute.get('/api/patient/all',authController.auth, patientController.getAllPatient);
+patientRoute.get('/api/patient/:id',authController.auth, patientController.getPatientById);
+patientRoute.put('/api/patient/:id',authController.auth, patientController.updatePatient);
+patientRoute.delete('/api/patient/:id',authController.auth, patientController.deletePatient);
+
+// patientRoute.get('/api/:email',authController.auth, patientController.getPatientByEmail);
+patientRoute.get('/api/:email', patientController.getPatientByEmail);
+patientRoute.get('/shareProfile/:email',patientController.shareProfile)
 
 export default patientRoute;

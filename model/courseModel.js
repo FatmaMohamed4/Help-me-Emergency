@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-// import userModel from './userModel';
+
  
 const courseSchema = new Schema({
   id: 
@@ -14,10 +14,10 @@ const courseSchema = new Schema({
     type: String ,
     required :[true,'Course name is required'] ,
     minlength :[3,'Course name is too short'],
-    maxlengtg :[25,'Course name is too long'],
+    maxlength :[25,'Course name is too long'],
   },
   evaluation:  Number,
-  patientId: Number,
+  patientId: Number
 } ,
 {timestamps :true}
 );

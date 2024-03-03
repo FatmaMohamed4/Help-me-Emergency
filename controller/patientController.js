@@ -1,16 +1,22 @@
 import mongoose from 'mongoose';
 import patientModel from '../model/patientModel.js';
 import bcryptjs from 'bcryptjs'
+import  Jwt  from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
+import  QRCode  from 'qrcode';
+import historyController from './historyController.js';
+import historyModel from '../model/historyModel.js';
 
 class patientController {
 //////////////////////////////////////// CRUD operations
     static getAllPatient= async (req, res) => {
         try {
-           
+         
             const result = await patientModel.find();
-            console.log(result);
+            // console.log(result);
             res.json(result);
+            
+            
           } catch (error) {
             console.error('Error reading patient:', error);
             res.status(500).send('Internal Server Error');
@@ -43,7 +49,9 @@ class patientController {
         try {
             const id = req.params.id;
             const result = await patientModel.findByIdAndUpdate(id, req.body, { new: true });
-    
+            // let token = req.headers;
+            // console.log(token)
+            // // Jwt.verify(,'project1')
             if (result) {
                 res.json({ msg: "Updated patient", result });
             } else {
@@ -71,6 +79,24 @@ class patientController {
         }
     }
 
+    static getPatientByEmail =async (req,res)=>{
+        try {
+            const email = req.params.email;
+
+        const result = await patientModel.find({email:email})
+
+            
+            if (result) {
+                res.json(result);
+            
+            } else {
+                res.status(404).json({ error: 'Patient not found' });
+            }
+        } catch (error) {
+            console.error('Error reading Patient by ID:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    }
 //////////////////////////////////////////// Authentications
 static registerPatient = async (req, res) => {
     const errors = validationResult(req);
@@ -145,7 +171,9 @@ static LogInPatient = async (req, res) => {
             return res.status(401).json({ error: 'Invalid password' });
         }
 
-        res.status(200).json("Login done");
+        let token = Jwt.sign({patientID : patient._id},'project1')
+        // res.status(200).json("Login done",token);
+        res.status(200).json({ message: "Login done", token });
 
     } catch (error) {
         console.error(error);
@@ -153,6 +181,39 @@ static LogInPatient = async (req, res) => {
     }
 }
 
+//run QR code 
+static shareProfile =async (req,res) =>{
+    // run correctly
+const email = req.params.email;
+
+    try {
+        const patient = await patientModel.findOne({ email: email }).select('-password -confirmPassword -createdAt -updatedAt');
+        
+        if (patient) {
+            const patientData = JSON.stringify(patient);
+
+            QRCode.toDataURL(patientData, (err, qrDataUrl) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500).json({ error: 'Internal server error' });
+                } else {
+                    // Send the QR code image directly to the browser
+                    res.writeHead(200, {
+                        'Content-Type': 'image/png',
+                        'Content-Length': qrDataUrl.length
+                    });
+                    res.end(Buffer.from(qrDataUrl.split('base64,')[1], 'base64'));
+                }
+            });
+        } else {
+            res.json({ msg: "Patient not found" });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+
+}
 
 }
 export default patientController

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import historyModel from '../model/historyModel.js';
-
+import  QRCode  from 'qrcode';
 class historyController {
     static createHistory =async (req,res) => {
           const {patientId,chronicDiseases,allergy,surgery} = req.body;
@@ -35,7 +35,6 @@ class historyController {
     }
 
 
-    
     static deleteHistory = async (req, res) => {
         try {
             const id = req.params.id;
@@ -51,7 +50,35 @@ class historyController {
         }
     }
 
+    // //run qrcode
+    static shareHistory = async (req, res) => {
+        const id = req.params.id;
+        try {
+            const history = await historyModel.findById(id).populate('patientId', '-_id -id -password -confirmPassword -patientId');
+            if (!history) {
+                return res.status(404).json({ error: 'History not found' });
+            }
+    
+            const patientData = JSON.stringify(history);
+            QRCode.toDataURL(patientData, (err, qrDataUrl) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).json({ error: 'Internal server error' });
+                }
+                // Send the QR code image directly to the browser
+                res.writeHead(200, {
+                    'Content-Type': 'image/png',
+                    'Content-Length': qrDataUrl.length
+                });
+                res.end(Buffer.from(qrDataUrl.split('base64,')[1], 'base64'));
+            });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    }
 
+    
  }
 
  export default historyController

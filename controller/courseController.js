@@ -37,7 +37,7 @@ class courseController {
        }
        
        static deleteCourse =async(req,res)=>{
-        let course = await noteModel.findByIdAndDelete({_id:req.params.id})
+        let course = await courseModel.findByIdAndDelete({_id:req.params.id})
         res.json({ msg: "Course is deleted" });
       }
 

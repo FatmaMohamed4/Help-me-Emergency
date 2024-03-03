@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import mongoose, { Schema, model } from 'mongoose';
 // const ObjectId = mongoose.Types.ObjectId ;
 
 const historySchema = new Schema({
@@ -6,6 +6,10 @@ const historySchema = new Schema({
     type: Schema.Types.ObjectId,
      ref: 'patient', required: true 
     },
+    // patientEmail: { 
+    //   type: String,
+    //    ref: 'patient', required: true 
+    //   },
   chronicDiseases : String ,
   allergy :Array,
   surgery :Array

@@ -10,4 +10,5 @@ historyRoute.get('/history/:id',historyController.getHistory)
 historyRoute.put('/history/:id',historyController.updateHistory)
 
 historyRoute.delete('/history/:id',historyController.deleteHistory)
+historyRoute.get('/shareHistory/:id',historyController.shareHistory)
 export default  historyRoute
