@@ -3,7 +3,7 @@ import { Schema, model } from 'mongoose';
 const patientSchema = new Schema ({
     name: {
         type: String ,
-        required :[true,"name is required"] ,
+        // required :[true,"name is required"] ,
         minlength :[3,"name is too short"],
         maxlengtg :[25,"name is too long"]
     },
@@ -12,27 +12,30 @@ const patientSchema = new Schema ({
     },
     password: {
         type: String ,
-        required : true,
+        // required : true,
     },
     confirmPassword: {
         type: String ,
-        required : true
+        // required : true
     },
     gender: {
         type: String ,
-        required : true
+        // required : true
     },
     phone: {
         type: String ,
-        required : true
+        // required : true
     },
     location: {
         type: String ,
-        required : true
+        // required : true
     },
     qr: {
         type: String ,
-        required : true
+        //  required : true
+    },
+    photo:{
+        type :String
     }
 }
 ,
