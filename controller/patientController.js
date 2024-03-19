@@ -4,19 +4,21 @@ import bcryptjs from 'bcryptjs'
 import  Jwt  from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
 import  QRCode  from 'qrcode';
+import multer from 'multer'
+import path from 'path'
+
+
 import historyController from './historyController.js';
 import historyModel from '../model/historyModel.js';
+
+
 
 class patientController {
 //////////////////////////////////////// CRUD operations
     static getAllPatient= async (req, res) => {
         try {
-         
             const result = await patientModel.find();
-            // console.log(result);
             res.json(result);
-            
-            
           } catch (error) {
             console.error('Error reading patient:', error);
             res.status(500).send('Internal Server Error');
@@ -26,14 +28,10 @@ class patientController {
     static getPatientById = async (req, res) => {
         try {
             const id = req.params.id;
-
             if (!mongoose.Types.ObjectId.isValid(id)) {
                 return res.status(400).json({ error: 'Invalid patient ID' });
             }
-
         const result = await patientModel.findById({_id:id})
-
-            
             if (result) {
                 res.json(result);
             } else {
@@ -117,6 +115,9 @@ static registerPatient = async (req, res) => {
                 return res.status(409).json({ error: 'This phone already exists' });
             }
 
+            // if (password != confirmPassword){
+            //     res.json({msg :"password does not match"})
+            // }
             // Hash the password before storing it in the database
             const hashedPassword = await bcryptjs.hash(password, 10);
 
@@ -172,6 +173,8 @@ static LogInPatient = async (req, res) => {
         }
 
         let token = Jwt.sign({patientID : patient._id},'project1')
+         // Set token as a cookie in the response
+         res.cookie('token', token, { httpOnly: true })
         // res.status(200).json("Login done",token);
         res.status(200).json({ message: "Login done", token });
 
@@ -181,7 +184,33 @@ static LogInPatient = async (req, res) => {
     }
 }
 
-//run QR code 
+
+//not sure //
+static logoutPatient = (req, res) => {
+    // Check if the user is logged in by verifying the presence of the token
+    const token = req.cookies.token;
+
+    if (!token) {
+        return res.status(401).json({ error: 'User not logged in' });
+    }
+
+    try {
+        
+        const expirationDate = new Date();
+        expirationDate.setHours(expirationDate.getDays() - 1);
+
+        // Clear the token cookie by setting an empty token with an expiration date
+        res.cookie('token', '', { expires: expirationDate, httpOnly: true });
+
+        // Respond with a message indicating successful logout
+        res.status(200).json({ message: 'Logout successful' });
+        res.redirect('/');
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+//////////////////////////////////////////// run QR code 
 static shareProfile =async (req,res) =>{
     // run correctly
 const email = req.params.email;
@@ -216,5 +245,6 @@ const email = req.params.email;
 }
 
 }
-export default patientController
+
+export default patientController 
 
