@@ -1,81 +1,70 @@
 import mongoose from 'mongoose';
 import emergencyModel from '../model/emergencyModel.js';
+import catchError from '../utilites/catchError.js';
+import AppError from '../utilites/AppError.js';
 class emergencyController {
-    static getAll= async (req, res) => {
-     try {
+    static getAll= catchError(async (req, res,next) => {
+      
+          const emrgency = await emergencyModel.find()
+          res.json(emrgency);
         
-         const courses = await emergencyModel.find()
-         res.json(courses);
-       } catch (error) {
-         console.error('Error reading emergencies:', error);
-         res.status(500).send('Internal Server Error');
-       }
-     }
+         if(!emrgency){
+          return next(new AppError('Emergencies not found',404))
+         }
+        
+      })
 
-     static  getById= async (req, res) => {
-      try {
+     static  getById= catchError(async (req, res,next) => {
 
-          const emergencyId = req.params.id;
-
-          const result = await emergencyModel.find({ id: emergencyId });
-          if (result) {
-            res.header('Content-Type', 'application/json');
-            res.send(JSON.stringify(result, null, 2));
-          } else {
-            res.status(404).send('Emergency not found');
-          }
-        } catch (error) {
-          console.error('Error reading emergency by ID:', error);
-          res.status(500).send('Internal Server Error');
-        }
+      const emergencyId = req.params.id;
+      const result = await emergencyModel.find({ id: emergencyId });
+      if (result) {
+        res.header('Content-Type', 'application/json');
+        res.send(JSON.stringify(result, null, 2));
+      } else {
+        return next(new AppError('Error in get Emergency',500))
       }
+    
+  })
    
-    static deleteById =async (req, res) => {
+    static deleteById =catchError(async (req, res,next) => {
       
       let emergency = await emergencyModel.findOneAndDelete({id:req.params.id})
-    res.json({ msg: "Emergency is deleted" });
-    }
+      if(!emergency){
+        return next(new AppError('Error in delete Emergency',500))
+      }
+    })
 
-    static create= async (req, res) => {
-      try {
-          // Extract emergency data from the request body
-          const newEmergencyData = req.body;
-      
-          // Check if the course ID already exists
-          const existingEmergency = await emergencyModel.findOne({ id: newEmergencyData.id });
-    
-          if (existingEmergency) {
-              res.send(`Emergency with ID ${newEmergencyData.id} already exists.`);
-          } else {
-
-              const result = await emergencyModel.insertMany(newEmergencyData);
-    
-          if (result){
-            res.send('created');
-          } else {
-            res.send('failed');
-          }
-          console.log(result);
-        
-        }
-    } catch (error) {
-          console.error('Error creating new emergency:', error);
-          res.status(500).send('Internal Server Error');
-        }
-  }
+ 
+    static create = catchError(async (req, res,next) => {
+      const newEmergencyData = req.body;
+      if (!newEmergencyData){
+        return next(new AppError('Failed to create',500))
+      }else{
+      const result = await emergencyModel.create(newEmergencyData);
+  
+      res.status(201).json({
+        status :true ,
+        message :"Added new emergency" ,
+        EmergencyData : result
+      })
+      }
+    })
 
 
-  static update = async (req, res) => {
-    try {
+
+
+  static update = catchError(async (req, res,next) => {
+   
         let emergency = await emergencyModel.findOneAndUpdate({ id: req.params.id }, { $set: req.body }, { new: true });
-        res.json({ msg: "Updated Note", emergency });
-    } catch (error) {
-        res.status(500).json({ error: "An error occurred while updating the emergency " });
-    }
+        res.json({ msg: "Updated Emergency", emergency });
+       if (!emergency) {
+ 
+        return next(new AppError('Not found Emergency',404))
+       }
+
 }
-
-
-
+)
 }
 
 

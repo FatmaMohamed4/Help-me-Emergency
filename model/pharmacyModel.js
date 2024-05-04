@@ -1,29 +1,20 @@
-import { Schema, model } from 'mongoose';
+import mongoose, { Schema, model ,Mongoose} from 'mongoose';
 
  
-const pharmacySchema = new Schema({
-  id: 
-  {
-    // type : Number,
-    // required:true,
-    
-  },
+const pharmacySchema = new mongoose.Schema({
   name: {
     type: String ,
-    // required:true,
+    required:true,
   },
   phone: {
     type: String ,
-    // required:true,
+    required:true,
+    unique:true
   },
   location:{
     type: String ,
-    // required:true,
-  },
-  // patientId:{
-  //   type: Schema.Types.ObjectId,
-  //   ref: 'patient', required: true 
-  // }
+    required:true,
+  }
 } ,
 {timestamps :true}
 );

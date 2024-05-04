@@ -1,12 +1,11 @@
-import { Schema, model } from 'mongoose';
-const emergencySchema = new Schema({
-    id:{type:Number ,required :[true,"id is require"]}  , 
-    state:{type :String,required :[true,"state is require"]} ,
-    image: {type :String,required :[true,"image is require"]} ,
-    fisrtAidSteps: {type :Array,required :[true,"fisrtAidSteps is require"]} ,
-    vedio: {type :String,required :[true,"vedio is require"]} ,
-    phone: {type :String,required :[true,"phone is require"]} ,
-
+import mongoose, { Schema, model } from 'mongoose';
+const emergencySchema = new mongoose.Schema({ 
+    title: { type: String, required: [true, "State is require"] },
+    imgMaster: { type: String, required: [true, "Image is require"] },
+    imgSteps: { type: String, required: [true, "Image is require"] },
+    video: { type: String, required: [true, "Video is require"] },
+    steps: {type :Array,required :[true,"Steps is require"]} ,
+    phone: {type :String,required :[true,"Phone is require"]} , 
 },
 {timestamps :true});
 

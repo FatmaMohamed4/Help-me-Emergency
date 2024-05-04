@@ -1,10 +1,10 @@
 import mongoose, { Schema, model } from 'mongoose';
-// const ObjectId = mongoose.Types.ObjectId ;
 
-const historySchema = new Schema({
+const historySchema = new mongoose.Schema({
   patientId: { 
     type: Schema.Types.ObjectId,
-     ref: 'patient', required: true 
+     ref: 'patient', 
+     required: [true,'ID is required'] 
     },
     // patientEmail: { 
     //   type: String,
