@@ -15,7 +15,9 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 import dotenv from 'dotenv';
-dotenv.config(); // Load environment variables from .env file
+import commentRoute from './routes/commentRoute.js';
+import globalError from './middleware/errMiddleware.js';
+dotenv.config(); 
 
 //Routes
 
@@ -27,23 +29,15 @@ app.use(medicineRoute)
 app.use(pharmacyRoute)
 app.use(photoRoute)
 app.use(postRoute)
+app.use(commentRoute)
+
 app.use('*', (req, res) => {
   res.json({ msg: "Cannot find the URL :" + req.originalUrl });
 });
 
 
-app.use((err, req, res, next) => {
-  // Handle errors here
-  console.error(err);
-
-  // Set a default error status code if not already set
-  if (!res.statusCode || res.statusCode < 400) {
-    res.status(500); // Internal Server Error
-  }
-
-  // Send error response
-  res.json({ error: err.message || 'Internal Server Error' });
-});
+// Global Error handling
+app.use(globalError);
 
 
 export default app

@@ -4,40 +4,53 @@ import {promisify} from 'util'
 import catchError from '../utilites/catchError.js';
 import AppError from '../utilites/AppError.js';
 import { sendToEmail } from './../utilites/Emails.js';
+import crypto from 'crypto'
+import asyncHandler from 'express-async-handler';
+
 
 
 class authController {
-    static registerPatient =catchError( async (req, res,next) => {
+    static registerPatient = asyncHandler( async (req, res,next) => {
         
          const newData =  await patientModel.create(req.body)
          if (!newData){
-            return next(new AppError('Error in adding Patient' ,500))
+             return next(new AppError('Error in register', 400) )
          }
            res.status(201).json({
             status:true,
             message:"Sign up Successfully",
            })
-           }  
+        }
           
     )
 
 
-    static LogInPatient = catchError(async (req, res,next) => {
-    
+    static LogInPatient = asyncHandler(async (req, res, next) => {
         const { email, password } = req.body;
         const patient = await patientModel.findOne({ email: email });
-        //
-            if (!patient || !await patient.correctPassword(password, patient.password)) {
-                return next(new AppError('Invalid email or password',401))
-            } 
-            let token = Jwt.sign({ userId: patient._id }, 'project1',{expiresIn:"90d"});  
-           
-            res.status(200).json({
+    
+        if (!patient || !await patient.correctPassword(password, patient.password)) {
+            throw new AppError('Invalid email or password', 401);
+        }
+    
+        let token = Jwt.sign({ userId: patient._id }, 'project1', { expiresIn: "90d" });
+    
+        // Check if the patient is an admin
+        if (patient.isAdmin) {
+            return res.status(200).json({
                 status: true,
+                message: "Log in Successfully as ADMIN",
+                token: token,
+            });
+        } else {
+            return res.status(200).json({
+                // status: true,
                 message: "Log in Successfully",
                 token: token,
             });
-})
+        }
+    });
+    
 
     static forgotPassword = catchError(async (req, res,next) => {   
             const user = await patientModel.findOne({ email: req.body.email });
@@ -117,7 +130,8 @@ class authController {
         next()
         }
         
-    
+
+
     static restrictTo=()=>{ 
         return (req,res,next)=>{
             if(!req.user.isAdmin){
@@ -127,6 +141,7 @@ class authController {
         }
     
     }
+
 
 }
 

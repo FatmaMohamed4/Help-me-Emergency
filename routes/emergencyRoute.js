@@ -8,13 +8,13 @@ const emergencyRoute = express.Router();
 
 
 
-emergencyRoute.get('/api/emergency/all',authController.protect,emergencyController.getAll);
-emergencyRoute.get('/api/emergency/:id',authController.protect,emergencyController.getById);
+emergencyRoute.get('/api/emergency/all' ,emergencyController.getAll);
+emergencyRoute.get('/api/emergency/:id' ,emergencyController.getById);
 
 //admins
-emergencyRoute.post('/api/emergency/create',authController.protect,authController.restrictTo(),emergencyController.create)
-emergencyRoute.delete('/api/emergency/:id',authController.protect,authController.restrictTo(),emergencyController.deleteById)
-emergencyRoute.put('/api/emergency/:id',authController.protect,authController.restrictTo(),emergencyController.update)
+emergencyRoute.post('/api/emergency/create' ,authController.restrictTo(),emergencyController.create)
+emergencyRoute.delete('/api/emergency/:id' ,authController.restrictTo(),emergencyController.deleteById)
+emergencyRoute.put('/api/emergency/:id' ,authController.restrictTo(),emergencyController.update)
 
 
 

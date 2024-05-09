@@ -1,11 +1,14 @@
 import express from 'express';
 import postController from '../controller/PostController.js';
+import authController from '../controller/authController.js';
 
 const postRoute = express.Router();
 
 
-postRoute.get('/posts',postController.getPosts)
-postRoute.post('/post',postController.addPost)
+postRoute.get('/post' ,postController.getPostsAndComments)
+postRoute.post('/post/create' ,postController.createPost)
+postRoute.delete('/post/delete/:id' ,postController.deletePostWithComments)
+
 
 
 

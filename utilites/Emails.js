@@ -25,5 +25,6 @@ export const sendToEmail = (email, otp) => {
             console.log('Email sent:', info.response);
         }
     });
+    console.log(mailOptions)
 }
 export default sendToEmail
