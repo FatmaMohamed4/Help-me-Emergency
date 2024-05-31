@@ -17,6 +17,7 @@ app.use(cors());
 import dotenv from 'dotenv';
 import commentRoute from './routes/commentRoute.js';
 import globalError from './middleware/errMiddleware.js';
+import diseasesRoute from './routes/diseasesRoute.js';
 dotenv.config(); 
 
 //Routes
@@ -30,6 +31,8 @@ app.use(pharmacyRoute)
 app.use(photoRoute)
 app.use(postRoute)
 app.use(commentRoute)
+app.use(diseasesRoute)
+
 
 app.use('*', (req, res) => {
   res.json({ msg: "Cannot find the URL :" + req.originalUrl });

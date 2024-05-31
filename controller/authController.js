@@ -38,13 +38,15 @@ class authController {
         // Check if the patient is an admin
         if (patient.isAdmin) {
             return res.status(200).json({
+                isAdmin :true ,
                 status: true,
                 message: "Log in Successfully as ADMIN",
                 token: token,
             });
         } else {
             return res.status(200).json({
-                // status: true,
+                isAdmin :false ,
+                status: true,
                 message: "Log in Successfully",
                 token: token,
             });

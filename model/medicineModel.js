@@ -1,5 +1,4 @@
 import mongoose, { Schema, model } from 'mongoose';
-
 const medicineSchema = new mongoose.Schema({
     medicineID: Number,
     diseaseName: String,

@@ -13,7 +13,7 @@ patientRoute.post('/register',authController.registerPatient);
 patientRoute.post('/login',authController.LogInPatient);
 // forget Password 
 patientRoute.post('/sendCode', authController.forgotPassword);
-patientRoute.patch('/reset' ,authController.resetPassword)
+patientRoute.patch('/reset' ,authController.protect,authController.resetPassword)
 patientRoute.post('/verify',authController.verifyOTP)
 
 // CRUD ==> All, byId, update, delete

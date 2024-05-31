@@ -10,8 +10,9 @@ class medicineController {
         return next(new AppError('Medicines not found',404))
       } 
       res.status(200).json({
-        message :"true" ,
-        result
+        satuts :"true" ,
+       message : result
+        
       })
  } )
     

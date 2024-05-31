@@ -10,7 +10,7 @@ const historySchema = new mongoose.Schema({
     //   type: String,
     //    ref: 'patient', required: true 
     //   },
-  chronicDiseases : String ,
+  chronicDiseases : Array ,
   allergy :Array,
   surgery :Array
 } ,

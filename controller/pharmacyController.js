@@ -3,16 +3,23 @@ import slugify from 'slugify';
 import patientModel from '../model/patientModel.js';
 import catchError from '../utilites/catchError.js';
 import AppError from '../utilites/AppError.js';
+import asyncHandler from 'express-async-handler';
+
 
 class pharmacyeController {
+    static getAllPharmacy = asyncHandler(async (req, res, next) => {
+        const result = await pharmacyModel.find();
+
+        if (!result || result.length === 0) {
+            return next(new AppError('Pharmacy not found', 404));
+        } else {
+            res.status(200).json({
+                status: "true",
+                message: result
+            });
+        }
+    });
     
-    static getAllPharmacy= catchError(async(req,res,next)=> {
-        const result = await pharmacyModel.find()
-        res.status(200).json({messag : "true" ,result});
-        if(!result){
-            return next(new AppError('Pharmacy not found',404))
-        } 
-})
 
     static getOnePharmacyById = catchError(async (req, res,next) => {
             const pid = req.params.id;
@@ -28,14 +35,17 @@ class pharmacyeController {
          })
 
      static getOnePharmacyByName = async (req, res,next) => {
-            const name = req.params.name;
-        const result = await pharmacyModel.find({name:name}).select('-patientId')
-            if (result) {
-                res.status(200).json({status : "true" ,pharmacy:result});
-            
-            } else {
-                return next(new AppError('Pharmacy not found',400))
-            }
+        const name = req.params.name;
+        if (!name) {
+            return next(new AppError('Name parameter is required', 400));
+        }
+
+        const result = await pharmacyModel.find({ name: name }).select('-patientId');
+        if (result.length > 0) {
+            res.status(200).json({ status: "true", pharmacy: result });
+        } else {
+            return next(new AppError('Pharmacy not found', 404));
+        }
      }
 
     static addPharmay = catchError(async (req,res,next) =>{

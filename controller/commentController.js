@@ -1,10 +1,15 @@
+import catchError from '../utilites/catchError.js';
 import commentModel from './../model/commentModel.js';
+import pkg from 'express-async-handler';
+const { asyncHandler } = pkg;
+
+
 
 
 class CommentController {
 
     // Create a new comment
-    static createComment = async (req, res, next) => {
+    static createComment = pkg(async (req, res, next) => {
         try {
             const postId  = req.params.id
             const comment =req.body.comment
@@ -17,8 +22,8 @@ class CommentController {
             // Handle error
             next(error); // Pass error to the error handling middleware
         }
-    };
-
+    }
+    )
     
 }
 
