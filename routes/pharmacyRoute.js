@@ -15,7 +15,7 @@ pharmacyRoute.get('/pharmacy',pharmacyController.filterPharmacy) //filter depend
 
 
 
-pharmacyRoute.post('/pharmacy/add',pharmacyController.addPharmay)
+pharmacyRoute.post('/pharmacy/addOne',pharmacyController.addPharmacy)
 pharmacyRoute.delete('/pharmacy/:id', pharmacyController.deletePharmacy)
 pharmacyRoute.patch('/pharmacy/:id',pharmacyController.updatePharmacy)
 

@@ -34,8 +34,7 @@ class authController {
         }
     
         let token = Jwt.sign({ userId: patient._id }, 'project1', { expiresIn: "90d" });
-    
-        // Check if the patient is an admin
+
         if (patient.isAdmin) {
             return res.status(200).json({
                 isAdmin :true ,

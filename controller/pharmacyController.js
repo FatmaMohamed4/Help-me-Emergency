@@ -6,17 +6,13 @@ import AppError from '../utilites/AppError.js';
 import asyncHandler from 'express-async-handler';
 
 
-class pharmacyeController {
+class pharmacyController {
     static getAllPharmacy = asyncHandler(async (req, res, next) => {
-        const result = await pharmacyModel.find();
+        const data = await pharmacyModel.find()
+        res.json(data);
 
-        if (!result || result.length === 0) {
-            return next(new AppError('Pharmacy not found', 404));
-        } else {
-            res.status(200).json({
-                status: "true",
-                message: result
-            });
+        if (!data) {
+            return next(new AppError('Pharmacy not found', 404))
         }
     });
     
@@ -48,19 +44,21 @@ class pharmacyeController {
         }
      }
 
-    static addPharmay = catchError(async (req,res,next) =>{
-        const newPharmacy = req.body;
-         const existPharmact = await pharmacyModel.findOne({ _id: newPharmacy.id });
-   
-         if (existPharmact) {
-           return next(new AppError('Pharmacy exists',409))
-         } else {
-            const result = await pharmacyModel.insertMany(newPharmacy);
-            if (result){
-             res.send('Added');
+     static addPharmacy = async (req, res, next) => {
+        try {
+           
+            const result = await pharmacyModel.create(req.body); // Assuming newPharmacy is an object
+            if (!result) {
+                return next(new AppError('Failed to add pharmacy', 500)); // Assuming you have AppError defined with appropriate status codes
+            }else
+            {
+                res.status(201).json({ message: 'Pharmacy added successfully', data: result });
             }
-     }
-})
+        } catch (error) {
+            return next(error); // Forwarding any errors to the error handler middleware
+        }
+    };
+    
 
     static deletePharmacy =catchError(async (req, res, next) => {
         const id = req.params.id
@@ -119,4 +117,4 @@ class pharmacyeController {
 }
 
 
-export default pharmacyeController
+export default pharmacyController

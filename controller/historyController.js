@@ -1,21 +1,35 @@
 import mongoose from 'mongoose';
 import historyModel from '../model/historyModel.js';
 import  QRCode  from 'qrcode';
+import  asyncHandler  from 'express-async-handler';
 import catchError from '../utilites/catchError.js';
 import AppError from '../utilites/AppError.js';
+import patientModel from '../model/patientModel.js';
+
 
 class historyController {
     static createHistory =catchError(async (req,res,next) => {
         const {patientId,chronicDiseases,allergy,surgery} = req.body;
         const history = await  historyModel.insertMany(req.body) ; 
-        if (!history) {
-            return next(new AppError('Error in Add history',500))
+        const patient = await  patientModel.findById({_id : patientId})
+        if(!patient){
+            return next(new AppError('Patient not found',404)) 
+        } else{
+            if (!history) {
+                return next(new AppError('Error in Add history',500))
+            }else{
+                res.status(201).json({
+                    status : true ,
+                    message : "created history "
+                })
+            }
         }
   })
    
     static getHistory = catchError(async (req, res,next) => { 
         const id = req.params.id;
-            const history = await historyModel.findById(id).populate('patientId', '-password -confirmPassword -patientId');
+        const history = await historyModel.findById(id).populate('patientId', '-password -confirmPassword -email -isAdmin -gender -location -phone');
+
             if (!history) {
                 return next(new AppError('History not found',404))
             }
@@ -46,28 +60,36 @@ class historyController {
     
 })
 
-    // //run qrcode
-    static shareHistory = catchError(async (req, res,next) => {
-        const id = req.params.id;
-        
-            const history = await historyModel.findById(id).populate('patientId', '-_id -id -password -confirmPassword -patientId');
-            if (!history) {
-                return next(new AppError('History not found',404))
-            }
-    
-            const patientData = JSON.stringify(history);
-            QRCode.toDataURL(patientData, (err, qrDataUrl) => {
-                // Send the QR code image directly to the browser
-                res.writeHead(200, {
-                    'Content-Type': 'image/png',
-                    'Content-Length': qrDataUrl.length
-                });
-                res.end(Buffer.from(qrDataUrl.split('base64,')[1], 'base64'));
-            });
-       
-    }
-)
-    
- }
+static shareHistory = async (req, res, next) => {
+    try {
+
+        const { id } = req.params;
+        // Validate if id is a valid ObjectId
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).send('Invalid patient ID');
+        }
+
+        // Call the static method
+        // const history = await historyModel.findById(id).populate('patientId', '-password -confirmPassword -email -isAdmin -gender -location -phone');
+
+        const history = await historyModel.findOne({ patientId: id }).populate('patientId', '-_id -id -password -confirmPassword -createdAt -updatedAt -email -isAdmin -gender -location -phone -otp -otpExpires -__v');
+
+
+        if (!history) {
+            return res.status(404).send('History not found for the provided patient ID');
+        }
+        const historyString = JSON.stringify(history);
+        const qrCodeBuffer = await QRCode.toBuffer(historyString);
+        res.set('Content-Type', 'image/png');
+        res.status(200).send(qrCodeBuffer);
+      } catch (error) {
+        res.status(500).send(`Error retrieving or generating QR code for history: ${error.message}`);
+        console.error(error);
+      }
+};
+
+
+}
+ 
 
  export default historyController

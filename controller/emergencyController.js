@@ -52,8 +52,6 @@ class emergencyController {
     })
 
 
-
-
   static update = catchError(async (req, res,next) => {
    
         let emergency = await emergencyModel.findOneAndUpdate({ id: req.params.id }, { $set: req.body }, { new: true });

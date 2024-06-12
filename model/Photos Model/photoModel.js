@@ -6,7 +6,12 @@ const photoSchema = new mongoose.Schema ({
          ref: 'patient', required: true 
         },
      name :String,  // in postman
-     photo :String   // photo upload in postman
+     photo :{
+        type : String ,
+        default: function() {
+            return this.gender === 'female' ? 'https://images.app.goo.gl/yzzhFFH6QL35HEu59' : 'https://images.app.goo.gl/yzzhFFH6QL35HEu59';
+        }
+     } // photo upload in postman
 },
 {timestamps :true})
 

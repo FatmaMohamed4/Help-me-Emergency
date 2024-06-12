@@ -1,6 +1,5 @@
 import express from 'express'
 
-import courseRoutes from './routes/courseRoute.js';
 import emergencyRoute from './routes/emergencyRoute.js';
 import historyRoute from './routes/historyRoute.js';
 import patientRoute from './routes/patientRoute.js';
@@ -18,11 +17,11 @@ import dotenv from 'dotenv';
 import commentRoute from './routes/commentRoute.js';
 import globalError from './middleware/errMiddleware.js';
 import diseasesRoute from './routes/diseasesRoute.js';
+import categoryRoute from './routes/categoryRoute.js';
 dotenv.config(); 
 
 //Routes
 
-app.use(courseRoutes)
 app.use(emergencyRoute)
 app.use(historyRoute)
 app.use(patientRoute)
@@ -32,6 +31,7 @@ app.use(photoRoute)
 app.use(postRoute)
 app.use(commentRoute)
 app.use(diseasesRoute)
+app.use(categoryRoute)
 
 
 app.use('*', (req, res) => {

@@ -35,25 +35,29 @@ const patientSchema = new mongoose.Schema({
         },
         required: [true, "Enter confirm password please"]
     },
-    gender: {
-        type: Array,
-        required: true
-    },
+    gender: [{
+        type: String,
+        enum: ['male', 'female'] ,
+        default :'female'
+    }] , 
     phone: {
         type: String,
         required: [true, "Enter your phone number"],
         unique: [true, "Enter valid phone number"]
     },
-    location: {
-        type: String,
-        required: true
-    },
+    // location: {
+    //     type: String,
+    //     required: true
+    // },
     qr: {
         type: String,
         //  required : true
     },
     photo: {
-        type: String
+        type: String ,
+        default: function() {
+            return this.gender === 'female' ? 'https://images.app.goo.gl/yzzhFFH6QL35HEu59' : 'https://images.app.goo.gl/yzzhFFH6QL35HEu59';
+        }
     },
     otp: {
         type: String

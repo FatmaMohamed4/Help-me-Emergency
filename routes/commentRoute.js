@@ -7,7 +7,7 @@ const commentRoute = express.Router();
 
 
 commentRoute.post('/comment/add/:id',CommentController.createComment)
-
+commentRoute.delete('/comment/delete/:id',CommentController.deleteComment)
 
 
 

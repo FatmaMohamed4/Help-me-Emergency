@@ -4,6 +4,10 @@ import {v2 as cloudinary} from 'cloudinary';
 import photoModel from '../model/Photos Model/photoModel.js';
 import photoEmergency from '../model/Photos Model/photo.Emergency.js';
 import catchError from '../utilites/catchError.js';
+import emergencyModel from './../model/emergencyModel.js';
+import diseasesModel from '../model/diseasesModel.js';
+import medicineModel from '../model/medicinesModel.js';
+import AppError from '../utilites/AppError.js';
 
 cloudinary.config({ 
   cloud_name: 'djzbdq0km', 
@@ -95,10 +99,12 @@ class photoController {
     static  lastProfilePhoto= catchError(async(req, res ,next)=> {
       const patientId = req.params.id;
       const lastPhoto = await photoModel.findOne({ patientId }).sort({ createdAt: -1 }).populate('patientId' -patientId);
-      res.json({ lastPhoto });
-      if(!lastPhoto){
-        return next(new AppError('last photo not found',404))
-      }
+      if (!lastPhoto) {
+        // If last photo not found, return a default image URL
+        return res.json({ lastPhoto: 'https://images.app.goo.gl/yzzhFFH6QL35HEu59' });
+    }
+
+    res.json({ lastPhoto });
     })
     
     static deleteLastPhoto = catchError(async (req, res, next) => {
@@ -113,10 +119,11 @@ class photoController {
   
       // Delete the photo from Cloudinary by its public ID
       await cloudinary.uploader.destroy(lastPhoto.photo);
-  
+      
       // Delete the photo record from the database
       await photoModel.findByIdAndDelete(lastPhoto._id);
   
+      lastPhoto.photo = 'https://images.app.goo.gl/yzzhFFH6QL35HEu59'
       // Respond with success message
       res.status(200).json({ message: 'Last photo deleted successfully' });
     });
@@ -174,14 +181,16 @@ class photoController {
             // Get the public URL of the uploaded image from Cloudinary
             const photoUrl = result.secure_url;
     
-            // Save the photo URL to your database (e.g., photoEmergency model)
-            const emergencyId = req.params.id;
-            await photoEmergency.create({ emergencyId, photo: photoUrl });
-    
+   
             // Store the Cloudinary URL for response
             photoUrls.push(photoUrl);
           }
-    
+                   // Assuming emergencyId is available in req.params.id
+      const emergencyId = req.params.id;
+
+      // Update the imgMaster field in the emergencyModel with the first photo URL
+      await emergencyModel.findByIdAndUpdate(emergencyId, { imgMaster: photoUrls[0] });
+
           // Respond with success message and photo URLs
           res.status(200).json({ message: 'Success', photoUrls });
         });
@@ -190,9 +199,9 @@ class photoController {
       static getPhotosEmergency = catchError(async (req, res, next) => {
         const emergencyId = req.params.id;
     
-        // Find photos associated with the specified emergencyId
-        const photos = await photoEmergency.find({ emergencyId });
-    
+         // Update the imgMaster field in the emergencyModel with the first photo URL
+      await emergencyModel.findByIdAndUpdate(emergencyId, { imgMaster: photoUrls[0] });
+
         if (!photos || photos.length === 0) {
           return next(new AppError('Photos not found', 404));
         }
@@ -244,6 +253,114 @@ class photoController {
           return next(new AppError('Failed to delete all photos', 500));
         }
       });
+
+
+      static uploadEmergencySTEPS = catchError(async (req, res, next) => {
+        upload.any()(req, res, async function (err) {
+          if (err) {
+            console.error(err);
+            return next(new AppError('Photos upload failed', 400));
+          }
+    
+          if (!req.files || req.files.length === 0) {
+            return next(new AppError('No photos uploaded', 400));
+          }
+    
+          // Iterate through each uploaded file and upload to Cloudinary
+          const photoUrls = [];
+          for (const file of req.files) {
+            // Upload file to Cloudinary
+            const result = await cloudinary.uploader.upload(file.path);
+    
+            // Get the public URL of the uploaded image from Cloudinary
+            const photoUrl = result.secure_url;
+    
+   
+            // Store the Cloudinary URL for response
+            photoUrls.push(photoUrl);
+          }
+                   // Assuming emergencyId is available in req.params.id
+      const emergencyId = req.params.id;
+
+      // Update the imgMaster field in the emergencyModel with the first photo URL
+      await emergencyModel.findByIdAndUpdate(emergencyId, { imgSteps: photoUrls[0] });
+
+          // Respond with success message and photo URLs
+          res.status(200).json({ message: 'Success', photoUrls });
+        });
+      });
+     
+
+
+      //Diseases
+      static uploadDiseasePhoto = catchError(async (req, res, next) => {
+        upload.any()(req, res, async function (err) {
+          if (err) {
+            console.error(err);
+            return next(new AppError('Photos upload failed', 400));
+          }
+    
+          if (!req.files || req.files.length === 0) {
+            return next(new AppError('No photos uploaded', 400));
+          }
+    
+          // Iterate through each uploaded file and upload to Cloudinary
+          const photoUrls = [];
+          for (const file of req.files) {
+            // Upload file to Cloudinary
+            const result = await cloudinary.uploader.upload(file.path);
+    
+            // Get the public URL of the uploaded image from Cloudinary
+            const photoUrl = result.secure_url;
+    
+   
+            // Store the Cloudinary URL for response
+            photoUrls.push(photoUrl);
+          }
+                   // Assuming emergencyId is available in req.params.id
+      const diseaseId = req.params.id;
+
+      // Update the imgMaster field in the emergencyModel with the first photo URL
+      await diseasesModel.findByIdAndUpdate(diseaseId, { imgSrc: photoUrls[0] });
+
+          // Respond with success message and photo URLs
+          res.status(200).json({ message: 'Success', photoUrls });
+        });
+      });
+
+
+      //Medicine
+
+    static  uploadMedicinePhoto = catchError(async (req, res, next) => {
+      upload.single('photo')(req, res, async function (err) {
+        if (err) {
+          console.error(err);
+          return next(new Error('Error uploading file'));
+        }
+    
+        if (!req.file) {
+          return next(new Error('No file uploaded', 404));
+        }
+    
+        // Get the public URL of the uploaded image from Cloudinary
+        const photoUrl = req.file.path;
+    
+        // Store the photo URL and related data in your database
+        const { id } = req.params;
+        const medicine = await medicineModel.findById(id);
+    
+        if (!medicine) {
+          return next(new Error('Medicine not found', 404));
+        }
+    
+        medicine.img = photoUrl;
+        await medicine.save();
+    
+        // Respond with success message
+        res.status(200).json({ message: 'Success', photoUrl });
+      });
+    });
+     
 }
 
 export default photoController;

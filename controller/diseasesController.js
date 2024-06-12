@@ -1,6 +1,4 @@
 import asyncHandler from 'express-async-handler';
-
-
 import diseasesModel from '../model/diseasesModel.js';
 import AppError from '../utilites/AppError.js';
 import catchError from '../utilites/catchError.js';

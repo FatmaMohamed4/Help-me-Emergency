@@ -17,13 +17,16 @@ patientRoute.patch('/reset' ,authController.protect,authController.resetPassword
 patientRoute.post('/verify',authController.verifyOTP)
 
 // CRUD ==> All, byId, update, delete
-patientRoute.get('/api/patient/all' ,authController.restrictTo(), patientController.getAllPatient);
+patientRoute.get('/api/patient/all' , patientController.getAllPatient);
 patientRoute.get('/api/patient/:id', patientController.getPatientById);
-patientRoute.put('/api/patient/:id', patientController.updatePatient);
+patientRoute.patch('/api/patient/:id', patientController.updatePatient);
 patientRoute.delete('/api/patient/:id', patientController.deletePatient);
 
 // patientRoute.get('/api/:email',authController.auth, patientController.getPatientByEmail);
 patientRoute.get('/api/:email',patientController.getPatientByEmail);
+
+// QR code 
+
 patientRoute.get('/shareProfile/:email',patientController.shareProfile)
 patientRoute.get('/logout',patientController.logoutPatient)
 export default patientRoute;
